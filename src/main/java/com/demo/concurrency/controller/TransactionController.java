@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.concurrency.dto.TransactionDTO;
-import com.demo.concurrency.service.TransactionService;
+import com.demo.concurrency.transaction.service.TransactionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ public class TransactionController {
 	
 	@RequestMapping(path = "/api/v1/transaction", method = RequestMethod.POST)
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public TransactionDTO insert(@RequestBody TransactionDTO transaction) throws Exception {
+	public TransactionDTO insert(@RequestBody TransactionDTO transaction) {
 		transactionService.save(transaction);		
 		return transaction;
 	}

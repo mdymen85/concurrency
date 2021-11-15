@@ -1,8 +1,10 @@
-package com.demo.concurrency.service;
+package com.demo.concurrency.transaction.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.demo.concurrency.entity.Client;
+import com.demo.concurrency.exception.ClientNotFoundException;
 import com.demo.concurrency.repository.ClientRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -11,16 +13,17 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class ClientService {
 	
 	private final ClientRepository clientRepository; 
 	
-	public Client getClient(String account) throws Exception {
+	public Client getClient(String account) {
 		
 		log.info("Trying to load {} account", account);
 		
 		return clientRepository.findByAccountPessimisticWrite(account)
-				.orElseThrow(() -> new Exception());
+				.orElseThrow(() -> new ClientNotFoundException());
 	}
 	
 	public Client save(Client client) {
