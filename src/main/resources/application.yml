@@ -7,3 +7,11 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     show-sql: true
+
+application:
+  lockmanager:
+    type: redis
+    port: 6379
+    host: localhost
+    release-timeout: 5000
+
