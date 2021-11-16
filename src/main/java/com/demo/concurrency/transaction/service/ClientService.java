@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.demo.concurrency.entity.Client;
 import com.demo.concurrency.exception.ClientNotFoundException;
 import com.demo.concurrency.repository.ClientJdbcLockRepository;
-import com.demo.repository.IClientRepository;
+import com.demo.concurrency.repository.IClientRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -20,6 +20,6 @@ public class LockManagerController {
 	@RequestMapping(method = RequestMethod.DELETE, path = "/api/v1/lock/{account}")
 	public void lock(@PathVariable String account) {
 		log.info("Unlocking account {}.", account);
-		lockService.unlock(account);
+		lockService.unsafeUnlock(account);
 	}
 }

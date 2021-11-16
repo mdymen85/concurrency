@@ -2,12 +2,16 @@ package com.demo.concurrency.lock;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import com.demo.concurrency.exception.TimeoutLockException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,39 +23,42 @@ public class LockManager implements Lock, Closeable {
 
 	private RedisTemplate<String,String> redisTemplate;
 	private String account;
-	private Long actualMillis = System.currentTimeMillis();
+	private RetryLock retryLock;
+	private String lockId;
 	
-	public LockManager(RedisTemplate<String,String> redisTemplate, String account) {
+	public LockManager(RedisTemplate<String,String> redisTemplate, String account, RetryLock retryLock) {
 		this.redisTemplate = redisTemplate;
 		this.account = account;
-	}
+		this.retryLock = retryLock;
+		this.lockId = UUID.randomUUID().toString();
+		log.info("Lock id {}.", lockId);
+	}	
 	
 	@Override
 	public void lock() {
 		
-		log.info("Aquired lock {}", account);
+		log.info("Trying to lock account {}", account);
 		
-		if (!redisTemplate.hasKey(account)) {
-			redisTemplate.opsForValue().set(account, account);
-			log.info("Account {} locked.", account);
-			while (true) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if (!redisTemplate.hasKey(account)) {
-					return;
-				}
-				
-				if (System.currentTimeMillis() > actualMillis + 5000) {
-					log.info("Lock account {} timeout!!!", account);
-					this.unlock();
-					return;
-				}
-			}			
+		Boolean isLocked = redisTemplate.hasKey(account);
+		
+		log.info("Account {} is locked? {}", account, isLocked);
+		
+		if (isLocked) {
+			isLocked = this.tryLock();
+			
+			if (isLocked) {
+				log.info("Locking account {} successfully...", account);
+				this.locking();
+			}
+			return;			
 		}
-		
+
+		this.locking();
+	}
+	
+	private void locking() {
+		redisTemplate.delete(account);
+		redisTemplate.opsForValue().setIfAbsent(account, lockId, 10, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -67,9 +74,8 @@ public class LockManager implements Lock, Closeable {
 	}
 
 	@Override
-	public boolean tryLock() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean tryLock() {	    
+		return retryLock.tryLock(redisTemplate, account);				
 	}
 
 	@Override
@@ -81,13 +87,25 @@ public class LockManager implements Lock, Closeable {
 	@Override
 	public void unlock() {
 		log.info("Releasing account lock {}", account);
+		String candidateId = redisTemplate.opsForValue().get(account);
+		if (!lockId.equals(candidateId)) {
+			throw new RuntimeException(); 
+		}
 		this.redisTemplate.delete(account);		
+	}
+	
+	public void unsafeUnlock() {
+		this.redisTemplate.delete(account);
 	}
 
 	@Override
 	public void close() throws IOException {
 		this.unlock();
 		
+	}
+	
+	public String getAccount() {
+		return this.account;
 	}
 
 }

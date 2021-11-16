@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.demo.concurrency.entity.Client;
-import com.demo.repository.IClientRepository;
 
 @Repository
 @ConditionalOnProperty(name = "application.lockmanager.type", havingValue = "jdbc", matchIfMissing = false)

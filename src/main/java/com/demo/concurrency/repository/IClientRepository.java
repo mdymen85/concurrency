@@ -1,4 +1,4 @@
-package com.demo.repository;
+package com.demo.concurrency.repository;
 
 import java.util.Optional;
 

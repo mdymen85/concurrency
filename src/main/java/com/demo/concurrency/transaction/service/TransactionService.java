@@ -31,33 +31,38 @@ public class TransactionService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void save(TransactionDTO transaction) {
 		
-		lockService.lock(transaction.getAccount());
-
-		Client client = this.clientService.getClient(transaction.getAccount());
+		var lockManager = lockService.lock(transaction.getAccount());
 		
-		log.info("Transaction requested: {}", transaction);
-		log.info("Balance before transaction: {}", client);
-
-		final Transaction ended = Transaction.builder()
-			.account(transaction.getAccount())
-			.deal(transaction.getDeal())
-			.transactionId(UUID.randomUUID().toString())
-			.type(transaction.getType())
-			.build();
-		
-		this.executeValidators(client, ended);	
-		
-		client.setBalance(client.getBalance().add(ended.getSignedDeal()));
-		
-		log.info("Balance after transaction: {}", client);
-		
-		this.clientService.save(client);			
-		
-		this.transactionRepository.save(ended);
-		
-		transaction.setCreated(ended.getCreated());
-		
-		lockService.unlock(transaction.getAccount());
+		try {
+			
+			Client client = this.clientService.getClient(transaction.getAccount());
+			
+			log.info("Transaction requested: {}", transaction);
+			log.info("Balance before transaction: {}", client);
+	
+			final Transaction ended = Transaction.builder()
+				.account(transaction.getAccount())
+				.deal(transaction.getDeal())
+				.transactionId(UUID.randomUUID().toString())
+				.type(transaction.getType())
+				.build();
+			
+			this.executeValidators(client, ended);	
+			
+			client.setBalance(client.getBalance().add(ended.getSignedDeal()));
+			
+			log.info("Balance after transaction: {}", client);
+			
+			this.clientService.save(client);			
+			
+			this.transactionRepository.save(ended);
+			
+			transaction.setCreated(ended.getCreated());
+			
+		}
+		finally {
+			lockService.unlock(lockManager);			
+		}	
 
 	}
 	
