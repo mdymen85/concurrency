@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@Deprecated
 public class RetryLock {
 
 	@Retryable(value = LockAquiredException.class , maxAttemptsExpression = "${retry.maxAttemps:15}"

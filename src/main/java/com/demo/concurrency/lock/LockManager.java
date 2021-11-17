@@ -16,6 +16,7 @@ import com.demo.concurrency.exception.TimeoutLockException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public class LockManager implements Lock, Closeable {
 	
 	@Value("${application.lockmanager.release-timeout:5000}")

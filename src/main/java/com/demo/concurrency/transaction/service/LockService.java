@@ -17,6 +17,7 @@ public class LockService {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final RetryLock retryLock;
 	
+	@Deprecated
 	public LockManager lock(String account) {
 		log.info("Trying to lock account {}", account);
 		var lockManager = new LockManager(redisTemplate, account, retryLock);
@@ -24,11 +25,13 @@ public class LockService {
 		return lockManager;
 	}
 	
+	@Deprecated
 	public void unlock(LockManager lockManager) {
 		log.info("Trying to unlock account {}", lockManager.getAccount());
 		lockManager.unlock();
 	}
 
+	@Deprecated
 	public void unsafeUnlock(String account) {
 		new LockManager(redisTemplate, account, retryLock).unsafeUnlock();
 		
