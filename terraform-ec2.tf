@@ -11,24 +11,43 @@ locals {
      ec2_instances = [
        {
             name = "nginx",
-            ip_address = "172.31.16.4"
+            ip_address = "172.31.16.4",
+            script = <<-EOF
+                        #!/bin/bash
+                        sudo apt-get update 
+                        sudo apt install docker -y       
+                        curl -sSL https://get.docker.com/ | sh 
+                        sudo service docker start 
+                        sudo usermod -a -G docker ubuntu
+                     EOF
             
        },
        {
             name = "server1",
-            ip_address = "172.31.16.5"       
+            ip_address = "172.31.16.5",
+            script = ""       
        },
        {
             name = "server2",
-            ip_address = "172.31.16.6"       
+            ip_address = "172.31.16.6",
+            script = ""            
        },
        {
             name = "database",
-            ip_address = "172.31.16.7"       
+            ip_address = "172.31.16.7",
+            script = <<-EOF
+                        #!/bin/bash
+                        sudo apt-get update 
+                        sudo apt install docker -y       
+                        curl -sSL https://get.docker.com/ | sh 
+                        sudo service docker start 
+                        sudo usermod -a -G docker ubuntu
+                     EOF      
        },
        {
             name = "redis",
-            ip_address = "172.31.16.8"       
+            ip_address = "172.31.16.8",
+            script = ""           
        },                     
      
      ]
@@ -57,7 +76,14 @@ resource "aws_security_group" "terraform_segurity_group" {
        to_port          = 8080
        protocol         = "tcp"
        cidr_blocks      = ["0.0.0.0/0"]
-     }                      
+     }        
+     egress {
+       from_port        = 0
+       to_port          = 0
+       protocol         = "-1"
+       cidr_blocks      = ["0.0.0.0/0"]
+       ipv6_cidr_blocks = ["::/0"]
+     }                   
      tags = {
         Name = "security_group_tf"
      }
@@ -76,31 +102,17 @@ resource "aws_instance" "terraform_ec2_example" {
     vpc_security_group_ids = [
          aws_security_group.terraform_segurity_group.id
     ]
-    provisioner "file" {
-         source = "install-docker.sh"
-         destination = "/tmp/install-docker.sh"
-    }
+ #   provisioner "file" {
+ #        source = "install-docker.sh"
+ #        destination = "/tmp/install-docker.sh"
+ #   }
     key_name   = "mdymen"    
     subnet_id = "subnet-056ceb1856e2d326e"
     tags = {
         Name = each.value.name
     }
-  
-    # Login to the ec2-user with the aws key.
-    connection {
-        type        = "ssh"
-        user        = "ubuntu"
-        private_key = file("~/.ssh/mdymen.pem")
-        host        = self.public_ip
-    }    
-    user_data = <<-EOF
-        #!/bin/bash
-        sudo apt-get update
-        sudo apt install docker -y      
-        curl -sSL https://get.docker.com/ | sh
-        sudo service docker start
-        sudo usermod -a -G docker ubuntu
-    EOF    
+  	
+    user_data = each.value.script  
 }
 
 
