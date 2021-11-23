@@ -41,8 +41,8 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8082</stringProp>
+          <stringProp name="HTTPSampler.domain">loadbalancer-1207891410.us-east-1.elb.amazonaws.com</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/api/v1/transaction</stringProp>

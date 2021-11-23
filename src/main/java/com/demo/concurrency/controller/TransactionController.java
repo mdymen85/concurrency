@@ -30,4 +30,10 @@ public class TransactionController {
 		
 	}
 	
+	@RequestMapping(path = "/health", method = RequestMethod.GET)
+	@ResponseStatus(code = HttpStatus.OK)
+	public void request() {
+		
+	}
+	
 }

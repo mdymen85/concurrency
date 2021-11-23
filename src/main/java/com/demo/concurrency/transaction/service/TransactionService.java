@@ -3,18 +3,13 @@ package com.demo.concurrency.transaction.service;
 import java.util.List;
 import java.util.UUID;
 
-import org.redisson.api.RKeys;
-import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.org.bouncycastle.pqc.jcajce.provider.rainbow.RainbowKeyFactorySpi;
 
 import com.demo.concurrency.dto.TransactionDTO;
 import com.demo.concurrency.entity.Client;
 import com.demo.concurrency.entity.Transaction;
-import com.demo.concurrency.lock.LockManager;
 import com.demo.concurrency.repository.TransactionRepository;
 import com.demo.concurrency.transaction.validation.IValidator;
 
