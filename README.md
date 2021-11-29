@@ -36,17 +36,15 @@ curl --location --request POST 'localhost:8081/api/v1/transaction' \
 }'
 ```
 
+```
+sudo docker run -p 8081:8080 --name concurrency -e MYSQL_HOST=172.31.16.7 -e REDIS_HOST=172.31.16.8 -d mdymen85/concurrency:latest 
+```
 
-docker network create concurrency-network
+```
+sudo docker run --name concurrency-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mdymen_pass -d mysql:latest
+sudo docker exec -i concurrency-mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < /data_concurrency.sql  
+```
 
-docker run --net concurrency-network --name concurrency-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mdymen_pass -d mysql:latest
-
-sleep 10
-
-docker exec -i concurrency-mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < /mysql/data.sql
-
-docker run --name redis -d -p 6379:6379 redis
-
-sleep 10
-
-docker run --net concurrency-network -p 8081:8080 --name concurrency -e MYSQL_HOST=<<MYSQL_HOST>> -e REDIS_HOST=<<REDIS_HOST>> -d mdymen85/concurrency:latest
+```
+sudo docker run --name redis -d -p 6379:6379 redis
+```
