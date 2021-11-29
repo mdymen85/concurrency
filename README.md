@@ -19,8 +19,22 @@ I use **Redisson** library for locking
 		</dependency>
 ```
 
-I developed a class called **RedissonLockManager** that receives a consumer that executes the method that need the lock. In this case i  
+I developed a class called **RedissonLockManager** that receives a consumer who will execute the method that need the lock. 
 
+
+![](https://github.com/mdymen85/concurrency/blob/main/diagram1.png)
+
+![](https://github.com/mdymen85/concurrency/blob/main/diagram2.png)
+
+```
+curl --location --request POST 'localhost:8081/api/v1/transaction' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "account": "00454",
+    "type": "CREDIT",
+    "deal": "1"
+}'
+```
 
 
 docker network create concurrency-network
