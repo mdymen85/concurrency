@@ -76,4 +76,8 @@ sudo docker exec -i concurrency-mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PA
 For run **redis**, it will create the container and redis image.
 ```
 sudo docker run --name redis -d -p 6379:6379 redis
+
+## Testing
+
+I tested the implementation using **Jmeter**. This allowed me to run 15 threads simultaneously, with 1000 requests to the same account. The goal was to request to the ELB, and this instance send the request between the instances in the Auto-Scalling Group. At the end of the process, the number of transaction and the balance value was perfect! This meant that the lock worked! Then i disabled the lock, and the system had a strange behaivor, the account balance and transaction numbers were incorrect.
 ```
