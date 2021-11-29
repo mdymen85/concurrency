@@ -1,8 +1,24 @@
 # Concurrency
 
-## Introduction
+## Problem
 
-This project aims to run an application with **redis** for distributed lock, in aws using **IaC** with **terraform**. The terraform file executes in an AWS environment, and creates an Auto-Scalling Group with two instances by default **EC2**. 
+Is not a strange situation in microservice environment to need to lock some code that lives in many instances. 
+
+## My solution
+
+This project aims to run an application with **redis** for distributed lock, in aws using **IaC** with **terraform**. The terraform file ***terraform-ec2.tf*** executes in an AWS environment, and creates an Auto-Scalling Group with two instances by default **EC2**. For run the terraform file, must config de connection to AWS adding the **AWS_ACCESS_KEY** and **AWS_SECRET_ACCESS_KEY**, and run this commands:
+
+```
+terraform init
+terraform apply
+```
+
+And for destroy the infraestructure:
+
+```
+terraform destroy
+```
+
 
 ## Entities
 
